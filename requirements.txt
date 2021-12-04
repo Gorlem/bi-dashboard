@@ -2,4 +2,4 @@ dash
 plotly
 sqlalchemy
 pandas
-mysqlclient
+pymysql

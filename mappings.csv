@@ -1,0 +1,41 @@
+entity_id	sensor	description
+sensor.bh1750_illuminance	Sensor 1	Beleuchtungsstärke
+sensor.bme280_humidity	Sensor 1	Feuchtigkeit
+sensor.bme280_pressure	Sensor 1	Luftdruck
+sensor.bme280_temperature	Sensor 1	Temperatur
+sensor.sensor_1_firmware_version	Sensor 1	Firmware Version
+binary_sensor.sensor_1_sensor_status	Sensor 1	Sensorstatus
+sensor.sensor_1_uptime	Sensor 1	Uptime
+sensor.sensor_1_wifi_signal	Sensor 1	WiFi-Signal
+sensor.bh1750_illuminance_2	Sensor 2	Beleuchtungsstärke
+sensor.sensor_2_firmware_version	Sensor 2	Firmware Version
+binary_sensor.sensor_2_sensor_status	Sensor 2	Sensorstatus
+sensor.sensor_2_uptime	Sensor 2	Uptime
+sensor.sensor_2_wifi_signal	Sensor 2	WiFi-Signal
+sensor.ccs811_eco2_value	Sensor 3	CO2 errechnet
+sensor.ccs811_total_volatile_organic_compound	Sensor 3	TVOC
+sensor.dht22_temperature	Sensor 3	Temperatur
+sensor.dht22_humidity	Sensor 3	Feuchtigkeit
+sensor.mh_z19_co2_value	Sensor 3	CO2
+sensor.sensor_3_firmware_version	Sensor 3	Firmware Version
+binary_sensor.sensor_3_sensor_status	Sensor 3	Sensorstatus
+sensor.sensor_3_uptime	Sensor 3	Uptime
+sensor.sensor_3_wifi_signal	Sensor 3	WiFi-Signal
+sensor.wlan_switch_energy_apparentpower	Smartplug 1	Scheinleistung
+sensor.wlan_switch_energy_current	Smartplug 1	Stromstärke
+sensor.wlan_switch_energy_factor	Smartplug 1	Phasenverschiebung
+sensor.wlan_switch_energy_power	Smartplug 1	Leistung
+sensor.wlan_switch_energy_reactivepower	Smartplug 1	Blindleistung
+sensor.wlan_switch_energy_today	Smartplug 1	Stromverbrauch (Tag)
+sensor.wlan_switch_energy_total	Smartplug 1	Stromverbrauch (total)
+sensor.wlan_switch_energy_voltage	Smartplug 1	Netzspannung
+sensor.wlan_switch_energy_yesterday	Smartplug 1	Stromverbrauch (Vortag)
+sensor.smartplug3_energy_apparentpower	Smartplug 3	Scheinleistung
+sensor.smartplug3_energy_current	Smartplug 3	Stromstärke
+sensor.smartplug3_energy_factor	Smartplug 3	Phasenverschiebung
+sensor.smartplug3_energy_power	Smartplug 3	Leistung
+sensor.smartplug3_energy_reactivepower	Smartplug 3	Blindleistung
+sensor.smartplug3_energy_today	Smartplug 3	Stromverbrauch (Tag)
+sensor.smartplug3_energy_total	Smartplug 3	Stromverbrauch (total)
+sensor.smartplug3_energy_voltage	Smartplug 3	Netzspannung
+sensor.smartplug3_energy_yesterday	Smartplug 3	Stromverbrauch (Vortag)
