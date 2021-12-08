@@ -2,7 +2,7 @@ from pandas.core import groupby
 import env
 
 import pandas as pd
-from sqlalchemy import create_engine, func, cast, select, Float, Table, Column, DateTime, Date, String, MetaData
+from sqlalchemy import create_engine, func, cast, select, distinct, Float, Table, Column, DateTime, Date, String, MetaData
 
 metadata = MetaData()
 
@@ -36,15 +36,15 @@ def humidity_comparison():
     return bme280_humidity.append(dht22_humidity)
 
 def wifi():
-    query1 = select(states.c.created, func.avg(cast(states.c.state, Float)).label('wifi1'))\
+    query1 = select(states.c.created, func.avg(cast(states.c.state, Float)).label('Sensor #1'))\
         .where(states.c.entity_id == 'sensor.sensor_1_wifi_signal')\
         .group_by(cast(states.c.created, Date))\
         .order_by(states.c.created.desc())
-    query2 = select(states.c.created, func.avg(cast(states.c.state, Float)).label('wifi2'))\
+    query2 = select(states.c.created, func.avg(cast(states.c.state, Float)).label('Sensor #2'))\
         .where(states.c.entity_id == 'sensor.sensor_2_wifi_signal')\
         .group_by(cast(states.c.created, Date))\
         .order_by(states.c.created.desc())
-    query3 = select(states.c.created, func.avg(cast(states.c.state, Float)).label('wifi3'))\
+    query3 = select(states.c.created, func.avg(cast(states.c.state, Float)).label('Sensor #3'))\
         .where(states.c.entity_id == 'sensor.sensor_3_wifi_signal')\
         .group_by(cast(states.c.created, Date))\
         .order_by(states.c.created.desc())
@@ -62,33 +62,54 @@ def amounts():
     return pd.read_sql(query, engine)
 
 def temperature():
-    query = select(states.c.created, states.c.state)\
-        .where(states.c.entity_id == 'sensor.dht22_temperature')\
-        .order_by(states.c.created.desc())\
-        .limit(50)
+    query = select(states.c.created, cast(states.c.state, Float).label('state'))\
+        .where(states.c.entity_id == 'sensor.dht22_temperature', states.c.created >= func.subdate(func.now(), 7))\
+        .order_by(states.c.created.desc())
     
     return pd.read_sql(query, engine, index_col='created')
 
 def humidity():
-    query = select(states.c.created, states.c.state)\
-        .where(states.c.entity_id == 'sensor.bme280_humidity')\
-        .order_by(states.c.created.desc())\
-        .limit(50)
+    query = select(states.c.created, cast(states.c.state, Float).label('state'))\
+        .where(states.c.entity_id == 'sensor.bme280_humidity', states.c.created >= func.subdate(func.now(), 7))\
+        .order_by(states.c.created.desc())
     
     return pd.read_sql(query, engine, index_col='created')
 
 def co2():
-    query = select(states.c.created, states.c.state)\
-        .where(states.c.entity_id == 'sensor.mh_z19_co2_value')\
-        .order_by(states.c.created.desc())\
-        .limit(50)
+    query = select(states.c.created, cast(states.c.state, Float).label('state'))\
+        .where(states.c.entity_id == 'sensor.mh_z19_co2_value', states.c.created >= func.subdate(func.now(), 7))\
+        .order_by(states.c.created.desc())
     
     return pd.read_sql(query, engine, index_col='created')
 
 def tvoc():
-    query = select(states.c.created, states.c.state)\
-        .where(states.c.entity_id == 'sensor.ccs811_total_volatile_organic_compound')\
-        .order_by(states.c.created.desc())\
-        .limit(50)
+    query = select(states.c.created, cast(states.c.state, Float).label('state'))\
+        .where(states.c.entity_id == 'sensor.ccs811_total_volatile_organic_compound', states.c.created >= func.subdate(func.now(), 7))\
+        .order_by(states.c.created.desc())
     
     return pd.read_sql(query, engine, index_col='created')
+
+def switch_power():
+    query = select(cast(states.c.state, Float).label('state'))\
+        .where(states.c.entity_id == 'sensor.wlan_switch_energy_power', states.c.created >= func.subdate(func.now(), 7))\
+        .order_by(states.c.created.desc())\
+    
+    return pd.read_sql(query, engine)
+
+def switch_current():
+    query = select(cast(states.c.state, Float).label('state'))\
+        .where(states.c.entity_id == 'sensor.wlan_switch_energy_current', states.c.created >= func.subdate(func.now(), 7))\
+        .order_by(states.c.created.desc())\
+    
+    return pd.read_sql(query, engine)
+
+def date_range():
+    query = select(func.max(states.c.created).label('last_date'), func.min(states.c.created).label('first_date'))
+
+    return pd.read_sql(query, engine)
+
+def amount_of_weekdays():
+    query = select(func.weekday(states.c.created).label('weekday'), func.count(distinct(cast(states.c.created, Date))).label('count'))\
+        .group_by(func.weekday(states.c.created))
+    
+    return pd.read_sql(query, engine, index_col='weekday')

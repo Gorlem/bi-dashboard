@@ -12,8 +12,10 @@ def mapping(df):
 def sensor_mapping(row, df, total_amount):
     if row['entity_id'] in mappings.index:
         sensor = mappings.loc[row['entity_id']]['sensor']
-        # percentage = int(df['amount'].where(df['entity_id'].isin(mappings.groupby('sensor'))).sum() / total_amount * 100)
         percentage = 0
+        same_sensor = mappings[mappings.sensor == sensor].index
+        sensor_total = df['amount'].where(df['entity_id'].isin(same_sensor))
+        percentage = int(sensor_total.sum() / total_amount * 100)
         return f"{sensor} ({percentage}%)"
     
     return 'Unknown'
