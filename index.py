@@ -21,6 +21,10 @@ locale.setlocale(locale.LC_ALL, 'de-DE')
 app = dash.Dash(__name__)
 
 lux_inside = db.lux_inside()
+
+lux_status = 'danger' if lux_inside.lux_inside[0] > 100 else 'success'
+lux_message = 'Belegt' if lux_status == 'danger' else 'Frei' 
+
 weekdays = {
     0: 0,
     1: 0,
@@ -67,8 +71,8 @@ all_switch_power = db.all_switch_power()
 lux_comp = lux_inside.resample('15T').mean().pad().join(lux_outside.resample('15T').mean().pad()).join(all_switch_power.resample('15T').mean().pad())
 print(lux_comp)
 lux_fig = px.scatter(lux_comp, y='lux_inside', x='lux_outside', color='power', height=300, labels={
-    'lux_outside': 'Lichtstärke Außen [lux]',
-    'lux_inside': 'Lichtstärke Innen [lux]',
+    'lux_outside': 'Lichtstärke Außen [Lux]',
+    'lux_inside': 'Lichtstärke Innen [Lux]',
     'power': 'Leistung [W]',
 })
 lux_fig.update_layout(
@@ -180,7 +184,7 @@ switch_power_fig = go.Figure(
 )
 switch_power_fig.update_layout(
     margin={ 'l': 30, 'r': 30, 't': 0, 'b': 0 },
-    height=150,
+    height=140,
     width=250,
 )
 
@@ -195,12 +199,13 @@ switch_current_fig = go.Figure(
 )
 switch_current_fig.update_layout(
     margin={ 'l': 30, 'r': 30, 't': 0, 'b': 0 },
-    height=150,
+    height=140,
     width=250,
 )
 
 daily_power = db.daily_wlan_switch_power()
 
+total_energy = db.total_switch_energy()
 
 date_range = db.date_range()
 print(date_range)
@@ -223,29 +228,82 @@ app.layout = html.Div(children=[
     ]),
     html.Div(className='section py-4', children=[
         html.Div(className='tile is-ancestor', children=[
-            html.Div(className='tile is-vertical is-parent', children=[
-                html.Div(className='tile is-child', children=[
-                    html.Nav(className='level', children=[
-                        html.Div(className='level-item has-text-centered', children=[
-                            html.Div(children=[
-                                html.Div(className='is-inline-block', children=[
-                                    dcc.Graph(figure=switch_power_fig, config=dict(locale='de')),
+            html.Div(className='tile is-vertical', children=[
+                html.Div(className='tile is-parent', children=[
+                    html.Div(className='tile is-child', children=[
+                        html.Nav(className='level', children=[
+                            html.Div(className='level-item has-text-centered', children=[
+                                html.Div(children=[
+                                    html.Span(className='tag is-success is-large', children='Online'),
+                                    html.P(className='heading', children='Sensor #1'),
                                 ]),
-                                html.P(className='heading', children='Leistung WLAN Switch'),
+                            ]),
+                            html.Div(className='level-item has-text-centered', children=[
+                                html.Div(children=[
+                                    html.Span(className='tag is-success is-large', children='Online'),
+                                    html.P(className='heading', children='Sensor #2'),
+                                ]),
+                            ]),
+                            html.Div(className='level-item has-text-centered', children=[
+                                html.Div(children=[
+                                    html.Span(className='tag is-success is-large', children='Online'),
+                                    html.P(className='heading', children='Sensor #3'),
+                                ]),
+                            ]),
+                            html.Div(className='level-item has-text-centered', children=[
+                                html.Div(children=[
+                                    html.Span(className='tag is-success is-large', children='Online'),
+                                    html.P(className='heading', children='WLAN Switch'),
+                                ]),
+                            ]),
+                            html.Div(className='level-item has-text-centered', children=[
+                                html.Div(children=[
+                                    html.Span(className='tag is-success is-large', children='Online'),
+                                    html.P(className='heading', children='Smartplug #3'),
+                                ]),
                             ]),
                         ]),
-                        html.Div(className='level-item has-text-centered', children=[
-                            html.Div(children=[
-                                html.H3(className='title is-3', children='123'),
-                                html.P(className='heading', children='Verbrauch insgesamt WLAN Switch'),
-                            ]),
-                        ]),
-                        html.Div(className='level-item has-text-centered', children=[
-                            html.Div(children=[
-                                html.Div(className='is-inline-block', children=[
-                                    dcc.Graph(figure=switch_current_fig, config=dict(locale='de')),
+                    ]),
+                ]),
+                html.Div(className='tile is-parent', children=[
+                    html.Div(className='tile is-child box', children=[
+                        # html.H5(className='title is-5', children=[
+                            html.Div(className='level mb-2', children=[
+                                html.Div(className='level-left', children=[
+                                    html.Div(className='level-item', children=[
+                                        html.H5(className='title is-5', children='WLAN Switch'),
+                                    ]),
                                 ]),
-                                html.P(className='heading', children='Stromstärke WLAN Switch'),
+                                html.Div(className='level-right', children=[
+                                    html.Div(className='level-item', children=[
+                                        'Gesamtverbrauch',
+                                        html.Span(className='tag is-dark is-medium mx-1', children='{:.4f} kWh'.format(total_energy.total[0])),
+                                    ]),
+                                ]),
+                            ]),
+                        # ]),
+                        html.Nav(className='level', children=[
+                            html.Div(className='level-item has-text-centered', children=[
+                                html.Div(children=[
+                                    html.Div(className='is-inline-block', children=[
+                                        dcc.Graph(figure=switch_power_fig, config=dict(locale='de')),
+                                    ]),
+                                    html.P(className='heading', children='Leistung [W]'),
+                                ]),
+                            ]),
+                            # html.Div(className='level-item has-text-centered', children=[
+                            #     html.Div(children=[
+                            #         html.H3(className='title is-3', children='{:.4f}'.format(total_energy.total[0])),
+                            #         html.P(className='heading', children='Gesamtverbrauch [kWh]'),
+                            #     ]),
+                            # ]),
+                            html.Div(className='level-item has-text-centered', children=[
+                                html.Div(children=[
+                                    html.Div(className='is-inline-block', children=[
+                                        dcc.Graph(figure=switch_current_fig, config=dict(locale='de')),
+                                    ]),
+                                    html.P(className='heading', children='Stromstärke [A]'),
+                                ]),
                             ]),
                         ]),
                     ]),
@@ -322,8 +380,6 @@ app.layout = html.Div(children=[
                         ]),
                     ]),
                 ]),
-                
-                html.Div(className='tile'),
             ]),
             html.Div(className='tile is-parent is-vertical', children=[
                 html.Div(className='tile is-child box', children=[
@@ -341,7 +397,18 @@ app.layout = html.Div(children=[
                     dcc.Graph(id='counts-graph', figure=counts_fig, config=dict(displayModeBar=False, locale='de')),
                 ]),
                 html.Div(className='tile is-child box', children=[
-                    html.H5(className='title is-5 mb-2', children='Raumnutzung'),
+                    html.Div(className='level mb-2', children=[
+                        html.Div(className='level-left', children=[
+                            html.Div(className='level-item', children=[
+                                html.H5(className='title is-5', children='Raumnutzung'),
+                            ]),
+                        ]),
+                        html.Div(className='level-right', children=[
+                            html.Div(className='level-item', children=[
+                                html.Span(className=f'tag is-{lux_status}', children=lux_message),
+                            ]),
+                        ]),
+                    ]),
                     dcc.Graph(id='illuminance-graph', figure=weekdays_fig, config=dict(displayModeBar=False)),
                 ]),
                 html.Div(className='tile is-child box', children=[
@@ -355,7 +422,7 @@ app.layout = html.Div(children=[
                         html.Tbody(children=
                             [html.Tr(children=[
                                 html.Td(children=row.Index.strftime('%A, %d.%m.%y')),
-                                html.Td(children="{:.4f}".format(row.power))
+                                html.Td(children='{:.4f}'.format(row.power))
                             ]) for row in daily_power.itertuples()]
                         )
                     ]),

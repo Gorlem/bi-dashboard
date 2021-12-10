@@ -16,7 +16,8 @@ states = Table('states', metadata,
 
 def lux_inside():
     query = select(states.c.created, cast(states.c.state, Float).label('lux_inside'))\
-        .where(states.c.entity_id == 'sensor.bh1750_illuminance')
+        .where(states.c.entity_id == 'sensor.bh1750_illuminance')\
+        .order_by(states.c.created.desc())
     
     return pd.read_sql(query, engine, index_col='created')
 
@@ -134,3 +135,9 @@ def daily_wlan_switch_power():
         .limit(5)
     
     return pd.read_sql(query, engine, index_col='created')
+
+def total_switch_energy():
+    query = select(func.max(cast(states.c.state, Float)).label('total'))\
+        .where(states.c.entity_id == 'sensor.wlan_switch_energy_total')
+    
+    return pd.read_sql(query, engine)
