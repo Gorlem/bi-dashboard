@@ -1,0 +1,5 @@
+html {
+    scrollbar-width: none;
+    height: 100%;
+    overflow: hidden;
+}

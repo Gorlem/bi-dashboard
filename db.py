@@ -14,9 +14,21 @@ states = Table('states', metadata,
     Column('entity_id', String)
 )
 
-def illuminance():
-    query = select(states.c.created, cast(states.c.state, Float).label('lux'))\
+def lux_inside():
+    query = select(states.c.created, cast(states.c.state, Float).label('lux_inside'))\
         .where(states.c.entity_id == 'sensor.bh1750_illuminance')
+    
+    return pd.read_sql(query, engine, index_col='created')
+
+def lux_outside():
+    query = select(states.c.created, cast(states.c.state, Float).label('lux_outside'))\
+        .where(states.c.entity_id == 'sensor.bh1750_illuminance_2')
+    
+    return pd.read_sql(query, engine, index_col='created')
+
+def all_switch_power():
+    query = select(states.c.created, cast(states.c.state, Float).label('power'))\
+        .where(states.c.entity_id == 'sensor.wlan_switch_energy_power')
     
     return pd.read_sql(query, engine, index_col='created')
 
@@ -113,3 +125,12 @@ def amount_of_weekdays():
         .group_by(func.weekday(states.c.created))
     
     return pd.read_sql(query, engine, index_col='weekday')
+
+def daily_wlan_switch_power():
+    query = select(states.c.created, func.max(cast(states.c.state, Float)).label('power'))\
+        .where(states.c.entity_id == 'sensor.wlan_switch_energy_today')\
+        .group_by(cast(states.c.created, Date))\
+        .order_by(func.max(cast(states.c.state, Float)).desc())\
+        .limit(5)
+    
+    return pd.read_sql(query, engine, index_col='created')
